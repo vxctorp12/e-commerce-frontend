@@ -1,8 +1,9 @@
-import { ShoppingBag, User, Search, Menu, LogOut } from 'lucide-react';
+import { Search, Menu, LogOut, User, Package } from 'lucide-react';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { logoutAction } from '@/actions/auth';
 import { Suspense } from 'react';
+import CartIcon from '@/components/cart/CartIcon';
 
 async function AuthActions() {
   const cookieStore = await cookies();
@@ -10,11 +11,16 @@ async function AuthActions() {
 
   if (isAuthenticated) {
     return (
-      <form action={logoutAction}>
-        <button type="submit" className="p-2 text-zinc-500 hover:text-zinc-900 transition-colors" title="Cerrar Sesión">
-          <LogOut className="w-5 h-5" />
-        </button>
-      </form>
+      <div className="flex items-center gap-2">
+        <Link href="/orders" className="p-2 text-zinc-500 hover:text-zinc-900 transition-colors" title="Mis Compras">
+          <Package className="w-5 h-5" />
+        </Link>
+        <form action={logoutAction}>
+          <button type="submit" className="p-2 text-zinc-500 hover:text-zinc-900 transition-colors" title="Cerrar Sesión">
+            <LogOut className="w-5 h-5" />
+          </button>
+        </form>
+      </div>
     );
   }
 
@@ -65,10 +71,7 @@ export default function Header() {
               <AuthActions />
             </Suspense>
 
-            <Link href="/cart" className="p-2 text-zinc-500 hover:text-zinc-900 transition-colors relative group">
-              <ShoppingBag className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-white group-hover:scale-110 transition-transform"></span>
-            </Link>
+            <CartIcon />
           </div>
         </div>
       </div>
