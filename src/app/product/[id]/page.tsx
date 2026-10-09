@@ -4,6 +4,8 @@ import AddToCartButton from '@/components/cart/AddToCartButton';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
+export const instant = false;
+
 async function getProduct(id: string): Promise<Product> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, {
     next: { tags: ['products'] }

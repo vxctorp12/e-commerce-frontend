@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Package, CheckCircle2, ChevronRight, Clock, XCircle } from 'lucide-react';
 
+export const instant = false;
+
 async function getOrders(): Promise<Order[]> {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
