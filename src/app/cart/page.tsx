@@ -1,12 +1,13 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
-import { Trash2, CreditCard, ArrowRight, Minus, Plus } from 'lucide-react';
+import { Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createOrderAction } from '@/actions/order';
 import { useRouter } from 'next/navigation';
+import StripeCheckoutForm from '@/components/cart/StripeCheckoutForm';
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
@@ -14,14 +15,13 @@ export default function CartPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // workaround para hidratación en cliente
-  const [mounted, setMounted] = import('react').then(mod => {
-      const [mounted, setMounted] = mod.useState(false);
-      mod.useEffect(() => setMounted(true), []);
-      return [mounted, setMounted];
-  }) as unknown as [boolean, (val: boolean) => void];
+  const [mounted, setMounted] = useState(false);
 
-  const handleCheckout = async () => {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleCheckout = async (paymentMethodId: string) => {
     setIsProcessing(true);
     setError(null);
 
@@ -30,17 +30,14 @@ export default function CartPage() {
       quantity: item.quantity
     }));
 
-    // Dummy Stripe token como sugiere la documentación Swagger de la API
-    const dummyStripeToken = 'tok_visa';
-
-    const result = await createOrderAction(orderItems, dummyStripeToken);
+    const result = await createOrderAction(orderItems, paymentMethodId);
 
     if (result.error) {
       setError(result.error);
       setIsProcessing(false);
     } else {
       clearCart();
-      // Redirigir al historial de órdenes o página de éxito
+      // Redirigir al historial de órdenes con confirmación de éxito
       router.push('/orders?success=true');
     }
   };
@@ -131,30 +128,26 @@ export default function CartPage() {
               </div>
             )}
 
-            <button
-              onClick={handleCheckout}
-              disabled={isProcessing}
-              className="w-full py-4 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center hover:bg-zinc-800 transition-all hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+            <Link
+              href="/checkout"
+              className="w-full mb-4 py-3.5 bg-zinc-900 text-white rounded-xl font-medium flex items-center justify-center hover:bg-zinc-800 transition-all shadow-sm hover:shadow text-sm"
             >
-              {isProcessing ? (
-                'Procesando Pago...'
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  Proceder al Pago
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </>
-              )}
-            </button>
-            <p className="text-center text-xs text-zinc-500 mt-4 flex items-center justify-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-              Pagos seguros procesados por Stripe
-            </p>
+              Proceder al Checkout
+            </Link>
+
+            <div className="relative my-4 text-center">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-200"></div></div>
+              <span className="relative bg-zinc-50 px-2 text-xs text-zinc-400 uppercase">O pagar aquí directamente</span>
+            </div>
+
+            <StripeCheckoutForm
+              totalPrice={totalPrice}
+              isProcessing={isProcessing}
+              onSubmit={handleCheckout}
+            />
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-import { ShoppingBag } from 'lucide-react';

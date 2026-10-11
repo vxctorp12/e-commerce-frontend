@@ -57,8 +57,6 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 font-medium text-sm text-zinc-600">
             <Link href="/" className="hover:text-zinc-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-zinc-900 after:origin-bottom-right after:scale-x-0 hover:after:scale-x-100 hover:after:origin-bottom-left after:transition-transform after:duration-300">Catálogo</Link>
-            <Link href="/categories" className="hover:text-zinc-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-zinc-900 after:origin-bottom-right after:scale-x-0 hover:after:scale-x-100 hover:after:origin-bottom-left after:transition-transform after:duration-300">Categorías</Link>
-            <Link href="/offers" className="hover:text-zinc-900 transition-colors relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-zinc-900 after:origin-bottom-right after:scale-x-0 hover:after:scale-x-100 hover:after:origin-bottom-left after:transition-transform after:duration-300">Ofertas</Link>
           </nav>
 
           {/* User Actions */}

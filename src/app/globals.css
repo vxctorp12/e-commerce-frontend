@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    background-color: #FAFAFA !important;
+    color: #18181b !important; /* zinc-900 */
+  }
+}
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-outfit: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;

@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function createOrderAction(items: { product_id: number; quantity: number }[], stripeToken: string) {
   const cookieStore = await cookies();
@@ -16,6 +16,7 @@ export async function createOrderAction(items: { product_id: number; quantity: n
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
@@ -24,14 +25,23 @@ export async function createOrderAction(items: { product_id: number; quantity: n
       })
     });
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      return { error: data.error || data.message || 'Error al procesar la orden y el pago' };
+    let data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      const text = await res.text();
+      console.error('Raw response from API:', text);
+      return { error: 'Error del servidor (500). Revisa los logs de Laravel.' };
     }
 
-    // Revalidamos el caché de productos ya que el stock ha disminuido
-    revalidateTag('products');
+    if (!res.ok) {
+      return { error: data.details || data.error || data.message || 'Error al procesar la orden y el pago' };
+    }
+
+    // Revalidamos el caché de productos y las rutas para evitar interfaces desactualizadas
+    revalidateTag('products', 'max');
+    revalidatePath('/orders');
+    revalidatePath('/');
 
     return { success: true, order: data.order };
   } catch (error) {

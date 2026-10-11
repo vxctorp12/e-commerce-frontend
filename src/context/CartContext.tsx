@@ -43,16 +43,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items, isMounted]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
+    if (Number(product.stock) <= 0) return;
     setItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.product.id === product.id);
       if (existingItem) {
+        const nextQty = Math.min(existingItem.quantity + quantity, product.stock);
         return prevItems.map((item) =>
           item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: nextQty }
             : item
         );
       }
-      return [...prevItems, { product, quantity }];
+      return [...prevItems, { product, quantity: Math.min(quantity, product.stock) }];
     });
   };
 
